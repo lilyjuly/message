@@ -4,18 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messenger UI</title>
-    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: rgb(214, 214, 191);
             margin: 0;
             padding: 0;
-            background-color: rgb(214, 214, 191);
         }
 
         .container {
@@ -26,6 +21,7 @@
             background: rgb(252, 249, 249);
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
+            position: relative;
         }
 
         .header {
@@ -40,10 +36,9 @@
 
         .message-area {
             width: 100%;
-            height: 300px; 
-            overflow-y: auto; 
+            height: 300px;
+            overflow-y: auto;
             border: 1px solid #ccc;
-            /* padding: 10px; */
             margin-bottom: 10px;
             background-color: #fff;
             border-radius: 5px;
@@ -53,32 +48,9 @@
 
         .message-wrapper {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             margin: 10px 0;
-        }
-
-        .avatar {
-            width: 40px; 
-            height: 40px;
-            border-radius: 50%;
             position: relative;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-
-        .status {
-            width: 10px; 
-            height: 10px;
-            background-color: green;
-            border-radius: 50%;
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            border: 2px solid white;
         }
 
         .message {
@@ -86,6 +58,7 @@
             margin: 5px 10px;
             border-radius: 10px;
             max-width: 70%;
+            position: relative;
         }
 
         .sent {
@@ -146,8 +119,42 @@
         #sendButton:hover {
             background-color: #45a049;
         }
-    </style>
 
+        /* Edit and Delete buttons CSS */
+        .edit-delete-wrapper {
+            display: flex;
+            position: absolute;
+            right: 0;
+            bottom: -30px; /* Adjust this value to control positioning */
+            z-index: 1;
+        }
+
+        .edit-delete-wrapper button {
+            margin: 0 5px; /* Adjust margins for spacing */
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .edit-button {
+            background-color: green;
+            color: white;
+        }
+
+        .delete-button {
+            background-color: red;
+            color: white;
+        }
+
+        .edit-delete-wrapper {
+            visibility: hidden; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
     <div class="container">
         <div class="header">
             <h1>Message</h1>
@@ -168,113 +175,126 @@
     </div>
 
     <script>
-      document.getElementById('sendButton').addEventListener('click', function() {
-        const messageInput = document.getElementById('messageInput');
-        const messageArea = document.getElementById('messageArea');
-        const message = messageInput.value.trim();
-
-        if (message === '') return;
-
-        // Create and append sent message
-        const newMessageWrapper = document.createElement('div');
-        newMessageWrapper.className = 'message-wrapper';
-
-        const newAvatar = document.createElement('div');
-        newAvatar.className = 'avatar';
-        newMessageWrapper.appendChild(newAvatar);
-
-        const newMessage = document.createElement('div');
-        newMessage.className = 'message sent';
-        newMessage.innerText = message;
-        newMessageWrapper.appendChild(newMessage);
-
-        messageArea.appendChild(newMessageWrapper);
-        messageArea.scrollTop = messageArea.scrollHeight; 
-        messageInput.value = ''; 
-
-        // Auto-reply logic
-        setTimeout(function() {
-            let reply = '';
-            if (message.toLowerCase() === 'hello') {
-                reply = 'hi';
-            } else if (message.toLowerCase() === 'နေကောင်းလား') {
-                reply = 'ကောင်းပါတယ်';
-            } else if (message.toLowerCase() === 'စားပီးပီလား') {
-                reply = 'ပီးပီးနင်ရော';
-            } else {
-                reply = 'အဲဒီတော့ဘာပြောရမလဲ';
-            }
-
-            const receivedMessageWrapper = document.createElement('div');
-            receivedMessageWrapper.className = 'message-wrapper';
-
-            const receivedAvatar = document.createElement('div');
-            receivedAvatar.className = 'avatar';
-            receivedAvatar.innerHTML = `<img src="images/PIA17001.jpg" alt="user avatar">
-                                        <div class="status"></div>`;
-            receivedMessageWrapper.appendChild(receivedAvatar);
-
-            const receivedMessage = document.createElement('div');
-            receivedMessage.className = 'message received';
-            receivedMessage.innerText = reply; 
-            receivedMessageWrapper.appendChild(receivedMessage);
-
-            messageArea.appendChild(receivedMessageWrapper);
-            messageArea.scrollTop = messageArea.scrollHeight; 
-        }, 1000); 
-    });  
-
-    document.getElementById('fileInput').addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (!file) {
-            console.log('No file selected.');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
+        document.getElementById('sendButton').addEventListener('click', function() {
+            const messageInput = document.getElementById('messageInput');
             const messageArea = document.getElementById('messageArea');
-            const imageMessageWrapper = document.createElement('div');
-            imageMessageWrapper.className = 'message-wrapper';
+            const message = messageInput.value.trim();
 
-            const imageAvatar = document.createElement('div');
-            imageAvatar.className = 'avatar';
-            imageMessageWrapper.appendChild(imageAvatar);
+            if (message === '') return;
 
-            const imageMessage = document.createElement('div');
-            imageMessage.className = 'message sent';
-            const imgElement = document.createElement('img');
-            imgElement.src = e.target.result;
-            imgElement.style.maxWidth = '100%'; // Ensures the image fits in the message bubble
-            imageMessage.appendChild(imgElement);
-            imageMessageWrapper.appendChild(imageMessage);
+            // Create and append sent message
+            const newMessageWrapper = document.createElement('div');
+            newMessageWrapper.className = 'message-wrapper';
 
-            messageArea.appendChild(imageMessageWrapper);
+            const newMessage = document.createElement('div');
+            newMessage.className = 'message sent';
+            newMessage.innerText = message;
+            newMessageWrapper.appendChild(newMessage);
+
+            // Add edit and delete buttons
+            const editDeleteWrapper = document.createElement('div');
+            editDeleteWrapper.className = 'edit-delete-wrapper';
+            editDeleteWrapper.innerHTML = `
+                <button class="edit-button">Edit</button>
+                <button class="delete-button">Delete</button>
+            `;
+            newMessageWrapper.appendChild(editDeleteWrapper);
+
+            messageArea.appendChild(newMessageWrapper);
             messageArea.scrollTop = messageArea.scrollHeight; 
+            messageInput.value = ''; 
 
-            // Auto-reply after image is sent
+            // Show edit and delete buttons when message is clicked
+            newMessage.addEventListener('click', function() {
+                editDeleteWrapper.style.visibility = 'visible'; // Show buttons
+            });
+
+            // Edit button functionality
+            editDeleteWrapper.querySelector('.edit-button').addEventListener('click', function() {
+                messageInput.value = newMessage.innerText; // Put message text back in input for editing
+                editDeleteWrapper.style.visibility = 'hidden'; // Hide buttons
+
+                // When the message is edited, change the inner text and remove previous visibility
+                messageInput.addEventListener('change', function() {
+                    newMessage.innerText = messageInput.value; // Update message text
+                    messageInput.value = ''; // Clear input
+                });
+            });
+
+            // Delete button functionality
+            editDeleteWrapper.querySelector('.delete-button').addEventListener('click', function() {
+                newMessageWrapper.remove(); // Remove the message on delete
+            });
+
+            // Auto-reply logic
             setTimeout(function() {
-                const imageReplyWrapper = document.createElement('div');
-                imageReplyWrapper.className = 'message-wrapper';
+                let reply = '';
+                if (message.toLowerCase() === 'hello') {
+                    reply = 'hi';
+                } else if (message.toLowerCase() === 'နေကောင်းလား') {
+                    reply = 'ကောင်းပါတယ်';
+                } else if (message.toLowerCase() === 'စားပီးပီလား') {
+                    reply = 'ပီးပီးနင်ရော';
+                } else {
+                    reply = 'အဲဒီတော့ဘာပြောရမလဲ';
+                }
 
-                const imageReplyAvatar = document.createElement('div');
-                imageReplyAvatar.className = 'avatar';
-                imageReplyAvatar.innerHTML = `<img src="images/PIA17001.jpg" alt="user avatar">
-                                              <div class="status"></div>`;
-                imageReplyWrapper.appendChild(imageReplyAvatar);
+                const receivedMessageWrapper = document.createElement('div');
+                receivedMessageWrapper.className = 'message-wrapper';
 
-                const imageReplyMessage = document.createElement('div');
-                imageReplyMessage.className = 'message received';
-                imageReplyMessage.innerText = 'ငါကြည့်လိုက်မယ်နော်'; 
-                imageReplyWrapper.appendChild(imageReplyMessage);
+                const receivedMessage = document.createElement('div');
+                receivedMessage.className = 'message received';
+                receivedMessage.innerText = reply; 
+                receivedMessageWrapper.appendChild(receivedMessage);
 
-                messageArea.appendChild(imageReplyWrapper);
+                messageArea.appendChild(receivedMessageWrapper);
                 messageArea.scrollTop = messageArea.scrollHeight; 
-            }, 1000); // Delay for the auto-reply
-        };
-        
-        reader.readAsDataURL(file); // Convert the image file to a data URL
-    });
+            }, 1000); 
+        });  
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        console.log('No file selected.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const messageArea = document.getElementById('messageArea');
+        const imageMessageWrapper = document.createElement('div');
+        imageMessageWrapper.className = 'message-wrapper';
+
+        const imageMessage = document.createElement('div');
+        imageMessage.className = 'message sent';
+        const imgElement = document.createElement('img');
+        imgElement.src = e.target.result; // Set the image source to the file reader result
+        imgElement.style.maxWidth = '100%'; // Adjust image width
+        imgElement.style.borderRadius = '10px'; // Rounded corners for image
+
+        imageMessage.appendChild(imgElement);
+        imageMessageWrapper.appendChild(imageMessage);
+        messageArea.appendChild(imageMessageWrapper);
+        messageArea.scrollTop = messageArea.scrollHeight; // Scroll to the bottom
+
+        // Auto-reply for image message
+        const reply = 'ငါကြည့်လိုက်မယ်'; // Set the auto-reply message
+        const receivedMessageWrapper = document.createElement('div');
+        receivedMessageWrapper.className = 'message-wrapper';
+
+        const receivedMessage = document.createElement('div');
+        receivedMessage.className = 'message received';
+        receivedMessage.innerText = reply; // Set the reply text
+        receivedMessageWrapper.appendChild(receivedMessage);
+
+        messageArea.appendChild(receivedMessageWrapper);
+        messageArea.scrollTop = messageArea.scrollHeight; // Scroll to the bottom
+    };
+
+    reader.readAsDataURL(file); // Read the file as a Data URL
+});
+
     </script>
 </body>
 </html>
+
